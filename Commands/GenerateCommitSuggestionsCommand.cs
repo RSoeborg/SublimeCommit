@@ -79,4 +79,51 @@ public static class GenerateCommitSuggestionsCommand
             goto redoMoreFiles;
     }
 
+
+    public static async Task GenerateStagedCommitSuggestion()
+    {
+        string? apiKey = ApiKeyCommand.LoadApiKey();
+        if (apiKey is null) return;
+
+        string compactSummary = GitWrapper.GetDiffCompactSummary(staged: true);
+        if (string.IsNullOrWhiteSpace(compactSummary))
+        {
+            Console.WriteLine("No changes detected");
+            return;
+        }
+        string editSummary = GitWrapper.GetDiffFiltered(GitWrapper.DiffFilter.Modified);
+
+        var httpClient = new HttpClient();
+        var openAi = new OpenAiWrapper(httpClient, apiKey);
+
+        await Spinner.StartAsync("Generating suggestions ...", async (spinner) =>
+        {
+            var commit = await openAi.GetStagedCommitSuggestionsAsync(
+                compactSummary,
+                editSummary
+            );
+
+            if (commit is null)
+            {
+                spinner.Fail();
+                Console.WriteLine("Failed to automatically get commit suggestions.");
+                return;
+            }
+
+            spinner.Succeed();
+
+            Console.WriteLine($"Commit message: {commit.CommitMessage}");
+            // ask for confirmation
+            Console.Write("Commit this? (Y/n) ");
+            var response = Console.ReadKey();
+
+            if (response.Key != ConsoleKey.Y && response.Key != ConsoleKey.Enter)
+            {
+                return;
+            }
+            Console.WriteLine();
+            GitWrapper.CommitChanges(commit.CommitMessage);
+        });
+
+    }
 }
