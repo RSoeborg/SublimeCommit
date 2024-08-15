@@ -5,7 +5,15 @@ var builder = CoconaApp.CreateBuilder();
 var app = builder.Build();
 
 // Default AI commit generation
-app.AddCommand(async () => await GenerateCommitSuggestionsCommand.GenerateCommitSuggestions());
+app.AddCommand(async ([Option] string? files) => {
+    if (string.IsNullOrWhiteSpace(files))
+        await GenerateCommitSuggestionsCommand.GenerateCommitSuggestions();
+
+    
+
+
+
+});
 
 // Set the OpenAI API token
 app.AddCommand("token", (string token) => ApiKeyCommand.SaveApiKey(token))
