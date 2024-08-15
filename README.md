@@ -23,3 +23,8 @@ SublimeCommit token my_token_5678
 
 The install command only works on unix based systems. 
 If you are on windows, you can still use the command "SublimeCommit" instead of "git ac".
+
+
+## Few todos:
+ - Make something like `git ac .` and `git ac my/file.txt` work, to target specific files
+ - Fixup: Installation on windows
