@@ -7,6 +7,48 @@ namespace Sublime.Commit;
 
 public sealed class GitWrapper
 {
+
+    private static string Git(string args) {
+        var gitProcess = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "git",
+                Arguments = args,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            }
+        };
+
+        StringBuilder outputBuilder = new();
+
+        gitProcess.OutputDataReceived += (sender, args) =>
+        {
+            if (!string.IsNullOrEmpty(args.Data))
+            {
+                outputBuilder.AppendLine(args.Data);
+            }
+        };
+
+        gitProcess.ErrorDataReceived += (sender, args) =>
+        {
+            if (!string.IsNullOrEmpty(args.Data))
+            {
+                outputBuilder.AppendLine(args.Data);
+            }
+        };
+
+        gitProcess.Start();
+        gitProcess.BeginOutputReadLine();
+        gitProcess.BeginErrorReadLine();
+        gitProcess.WaitForExit();
+        gitProcess.Close();
+
+        return outputBuilder.ToString();
+    }
+
     /// <summary>
     /// Runs the 'git diff --compact-summary' command and captures its output.
     /// </summary>
@@ -52,135 +94,21 @@ public sealed class GitWrapper
     /// </summary>
     /// <returns>A string containing the output of the 'git diff' command.</returns>
     static string GetDiff(string args)
-    {
-        var diffProcess = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "git",
-                Arguments = $"diff {args}",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-
-        StringBuilder outputBuilder = new();
-
-        diffProcess.OutputDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-            {
-                outputBuilder.AppendLine(args.Data);
-            }
-        };
-
-        diffProcess.ErrorDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-            {
-                outputBuilder.AppendLine(args.Data);
-            }
-        };
-
-        diffProcess.Start();
-        diffProcess.BeginOutputReadLine();
-        diffProcess.BeginErrorReadLine();
-        diffProcess.WaitForExit();
-        diffProcess.Close();
-
-        return outputBuilder.ToString();
-    }
-
+        => Git($"diff {args}");
 
     /// <summary>
     /// Runs the 'git add [file]' command.
     /// </summary>
     /// <param name="file">The file to add to the Git repository.</param>
     public static void AddCommitFile(string file)
-    {
-        var addProcess = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "git",
-                Arguments = $"add {file}",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-
-        addProcess.OutputDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-            {
-                Console.WriteLine(args.Data);
-            }
-        };
-
-        addProcess.ErrorDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-            {
-                Console.WriteLine(args.Data);
-            }
-        };
-
-        addProcess.Start();
-        addProcess.BeginOutputReadLine();
-        addProcess.BeginErrorReadLine();
-        addProcess.WaitForExit();
-        addProcess.Close();
-    }
-
+        => Git($"add {file}");
+    
     /// <summary>
     /// Runs the 'git status --porcelain' command and captures its output.
     /// </summary>
     /// <returns>A string containing the output of the 'git status --porcelain' command.</returns>
-    public static string GetStatus() {
-        var statusProcess = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "git",
-                Arguments = "status --porcelain",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-
-        StringBuilder outputBuilder = new();
-
-        statusProcess.OutputDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-            {
-                outputBuilder.AppendLine(args.Data);
-            }
-        };
-
-        statusProcess.ErrorDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-            {
-                outputBuilder.AppendLine(args.Data);
-            }
-        };
-
-        statusProcess.Start();
-        statusProcess.BeginOutputReadLine();
-        statusProcess.BeginErrorReadLine();
-        statusProcess.WaitForExit();
-        statusProcess.Close();
-
-        return outputBuilder.ToString();
-    }
-
+    public static string GetStatus()
+        => Git("status --porcelain");
 
     /// <summary>
     /// Runs the 'git commit -m [message]' command.
@@ -188,47 +116,8 @@ public sealed class GitWrapper
     /// <param name="message">The commit message.</param>
     /// <returns>True if the commit was successful, false otherwise.</returns>
     public static bool CommitChanges(string message)
-    {
-        var commitProcess = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "git",
-                Arguments = $"commit -m \"{message}\" --no-verify",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-
-        StringBuilder outputBuilder = new();
-
-        commitProcess.OutputDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-            {
-                outputBuilder.AppendLine(args.Data);
-            }
-        };
-
-        commitProcess.ErrorDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-            {
-                outputBuilder.AppendLine(args.Data);
-            }
-        };
-
-        commitProcess.Start();
-        commitProcess.BeginOutputReadLine();
-        commitProcess.BeginErrorReadLine();
-        commitProcess.WaitForExit();
-        commitProcess.Close();
-
-        return outputBuilder.ToString().Contains("Committed");
-    }
-
+        => Git($"commit -m \"{message}\" --no-verify").Contains("Committed");
+    
     /// <summary>
     /// Checks if the current directory is a Git repository by examining the output of the 'git diff' command.
     /// </summary>
@@ -236,10 +125,6 @@ public sealed class GitWrapper
     public static bool IsGitRepository()
     {
         var diffOutput = GetDiff("");
-        if (diffOutput.StartsWith("warning: Not a git repository") || diffOutput.StartsWith("fatal: not a git repository"))
-        {
-            return false;
-        }
-        return true;
+        return diffOutput.StartsWith("warning: Not a git repository") || diffOutput.StartsWith("fatal: not a git repository");
     }
 }
