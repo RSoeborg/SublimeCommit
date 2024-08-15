@@ -52,8 +52,9 @@ public sealed class GitWrapper
     /// <summary>
     /// Runs the 'git diff --compact-summary' command and captures its output.
     /// </summary>
+    /// <param name="staged">Whether to show the compact summary of staged files.</param>
     /// <returns>A string containing the compact summary output of the 'git diff' command.</returns>
-    public static string GetDiffCompactSummary() => GetDiff("--compact-summary");
+    public static string GetDiffCompactSummary(bool staged = false) => GetDiff($"--compact-summary {(staged ? "--staged" : "")}");
 
 
     /// <summary>
@@ -85,9 +86,10 @@ public sealed class GitWrapper
     /// Runs the 'git diff --diff-filter=[filter]' command and captures its output.
     /// </summary>
     /// <param name="filter">The filter to apply to the 'git diff' command.</param>
+    /// <param name="staged">Whether to apply the filter to staged files.</param>
     /// <returns>A string containing the output of the 'git diff' command with the specified filter.</returns>
-    public static string GetDiffFiltered(DiffFilter filter) => 
-        GetDiff($"--diff-filter={GetDiffFilterVariable(filter)} -U0");
+    public static string GetDiffFiltered(DiffFilter filter, bool staged = false) => 
+        GetDiff($"--diff-filter={GetDiffFilterVariable(filter)} -U0 {(staged ? "--staged" : "")}");
 
     /// <summary>
     /// Runs the 'git diff' command and captures its output.
