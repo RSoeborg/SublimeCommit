@@ -1,18 +1,18 @@
 ﻿using Cocona;
+using Sublime.Commit;
 using Sublime.Commit.Commands;
 
 var builder = CoconaApp.CreateBuilder();
 var app = builder.Build();
 
 // Default AI commit generation
-app.AddCommand(async ([Option] string? files) => {
-    if (string.IsNullOrWhiteSpace(files))
-        await GenerateCommitSuggestionsCommand.GenerateCommitSuggestions();
+app.AddCommand(async () => {
+    await GenerateCommitSuggestionsCommand.GenerateCommitSuggestions();
+});
 
-    
-
-
-
+app.AddCommand("add", async ([Argument] string fileOrFiles) => {
+    GitWrapper.AddCommitFile(fileOrFiles);
+    await GenerateCommitSuggestionsCommand.GenerateStagedCommitSuggestion();
 });
 
 // Set the OpenAI API token
