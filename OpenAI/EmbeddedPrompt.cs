@@ -56,4 +56,41 @@ public static class EmbeddedPromptResources
         }
     }
     """;
+
+
+    public static string SingleCommitPrompt =
+    """
+    {
+        "model": "gpt-4o-2024-08-06",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a git expert. You are given a compact-summary and summary of edited files using git diff (staged). Generate the correct commit message for the changes. A commit message must start with build, chore, ci, feat, fix, refactor, revert, test, or merge."
+            },
+            {
+                "role": "user",
+                "content": ""
+            }
+        ],
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "git_commit_message",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "commit_message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "commit_message"
+                    ],
+                    "additionalProperties": false
+                },
+                "strict": true
+            }
+        }
+    }
+    """;
 }
