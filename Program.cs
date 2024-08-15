@@ -6,8 +6,11 @@ var builder = CoconaApp.CreateBuilder();
 var app = builder.Build();
 
 // Default AI commit generation
-app.AddCommand(async () => {
-    await GenerateCommitSuggestionsCommand.GenerateCommitSuggestions();
+app.AddCommand(async ([Option] bool staged = false) => {
+    if (!staged)
+        await GenerateCommitSuggestionsCommand.GenerateCommitSuggestions();
+    else
+        await GenerateCommitSuggestionsCommand.GenerateStagedCommitSuggestion();
 });
 
 app.AddCommand("add", async ([Argument] string fileOrFiles) => {
