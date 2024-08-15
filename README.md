@@ -1,12 +1,15 @@
 ## Automatic git commit messages
 
-Installation guide:
+Small command line tool, that helps you generate commits quickly. 
+It chunks relevant files together, and tries to generate a commit message.
+
+Installation guide (MacOs/Linux):
 
 This will enable the command: `git ac` for git auto commit.
 The token is your OpenAI api key.
 
 ```
-dotnet install -g SublimeCommit
+dotnet tool install --global SublimeCommit
 SublimeCommit install --token my_token_1234
 ```
 
