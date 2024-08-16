@@ -126,7 +126,7 @@ public sealed class GitWrapper
     /// <returns>True if the current directory is a Git repository, false otherwise.</returns>
     public static bool IsGitRepository()
     {
-        var diffOutput = GetDiff("");
-        return diffOutput.StartsWith("warning: Not a git repository") || diffOutput.StartsWith("fatal: not a git repository");
+        var status = GetStatus();
+        return !status.StartsWith("warning: Not a git repository") && !status.StartsWith("fatal: not a git repository");
     }
 }
