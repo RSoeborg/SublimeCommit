@@ -16,7 +16,7 @@ public static class InstallCommand
         StringBuilder shellScript = new();
 
         shellScript.AppendLine("#!/bin/bash");
-        shellScript.AppendLine("echo '#!/bin/sh\nsublimecommit' > /usr/local/bin/git-ac");
+        shellScript.AppendLine("echo '#!/bin/sh\nsublimecommit \"$@\"' > /usr/local/bin/git-ac");
         shellScript.AppendLine("chmod +x /usr/local/bin/git-ac");
         shellScript.AppendLine("echo ' alias created successfully: git ac'");
 
