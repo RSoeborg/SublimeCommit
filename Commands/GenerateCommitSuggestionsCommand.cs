@@ -96,7 +96,7 @@ public static class GenerateCommitSuggestionsCommand
         var httpClient = new HttpClient();
         var openAi = new OpenAiWrapper(httpClient, apiKey);
 
-        await Spinner.StartAsync("Generating suggestions ...", async (spinner) =>
+        await Spinner.StartAsync("Generating suggestion ...", async (spinner) =>
         {
             var commit = await openAi.GetStagedCommitSuggestionsAsync(
                 compactSummary,
